@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+*.log
+
+# ML artifacts
+*.h5
+*.keras
+*.pkl
+*.joblib
+checkpoints/
+models/
+
+# Data
+# Medical or restricted datasets must not be committed.
+data/
+datasets/
+
+# Streamlit secrets
+.streamlit/secrets.toml
