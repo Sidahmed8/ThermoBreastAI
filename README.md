@@ -1,134 +1,137 @@
 # 🌡️ ThermoBreastAI
 
-### Breast Thermal Image Analysis with Deep Learning & Computer Vision
+**Interpretable Machine Learning for Breast Thermal-Image Analysis**
 
-ThermoBreastAI is my Master's final project in **Data Science and Data Engineering**. It explores the use of **breast thermal images, Computer Vision and Deep Learning** to build a research prototype for assisting the analysis of thermal patterns related to breast abnormalities.
+ThermoBreastAI is my Master's research project in Data Science and Data Engineering. It investigates whether thermal-image features can support the **research analysis of breast abnormalities** through a rigorous Machine Learning pipeline, interpretable features, patient-aware validation and an interactive Streamlit application.
 
-> ⚠️ **Medical disclaimer:** ThermoBreastAI is an academic research and decision-support prototype. It is **not a medical diagnostic system** and must not replace evaluation by qualified healthcare professionals.
+> **Medical-use limitation:** This repository is an academic research prototype. It is **not a medical diagnostic device** and does not replace clinical examination, mammography, ultrasound, MRI, biopsy or medical advice.
 
----
+## Why this project matters
 
-## 🎯 Project Objective
+Thermal imaging is non-ionizing and contactless, but Machine Learning results can be misleading when images from the same patient leak across training and evaluation sets. A central objective of this work was therefore not only predictive performance, but also **methodological rigor and interpretability**.
 
-The project focuses on building an end-to-end workflow for thermal-image analysis, from image preprocessing to predictive modeling and interactive visualization.
+The project compares classical Machine Learning, Deep Learning baselines and multiple feature families, while using patient-group validation, threshold analysis and uncertainty estimation.
 
-The main objectives are to:
+## Main results
 
-- Prepare and preprocess breast thermal images
-- Develop a Deep Learning classification approach
-- Evaluate model performance using appropriate classification metrics
-- Build an interactive interface for presenting model outputs
-- Explore how Artificial Intelligence can support thermal-image research
+| Configuration | Accuracy | Sensitivity | Specificity | F1 | AUC |
+|---|---:|---:|---:|---:|---:|
+| Logistic Regression + **Texture** | 0.7967 | **0.9778** | 0.5250 | 0.8523 | **0.9526** |
+| Logistic Regression + **Thermal + Texture** | **0.8667** | 0.9722 | 0.7083 | **0.8974** | 0.9497 |
+| Logistic Regression + Hybrid | 0.8467 | 0.9667 | 0.6667 | 0.8832 | 0.9170 |
 
----
+For the best-AUC ML configuration, bootstrap analysis gives an AUC mean of **0.9528** with a **95% interval of approximately [0.9308, 0.9723]**.
 
-## 🧠 Machine Learning Workflow
+Threshold analysis also illustrates the screening trade-off: at a threshold of **0.15**, sensitivity reaches **1.00** on the held-out result table, with lower specificity; higher thresholds improve specificity while increasing false negatives.
+
+## Dataset / evaluation summary
+
+Project artifacts report:
+
+- **1,522** thermal images
+- **762** normal and **760** suspect images
+- **56** patient groups
+- **1,222** train images and **300** held-out test images
+- **0 patient overlap** in the project train/test workflow
+- Patient-group robustness analysis with **GroupKFold**
+- Bootstrap confidence intervals for the best ML model
+
+Raw medical-image data are intentionally **not published** in this repository.
+
+## Public inference model
+
+The released interactive demo uses:
+
+- 224×224 preprocessing
+- grayscale conversion, bilateral denoising and CLAHE
+- 256-level GLCM computation in 4 directions
+- 12 GLCM texture features
+- StandardScaler
+- Logistic Regression
+
+The model bundle included in `models/` was serialized with **scikit-learn 1.6.1**, which is pinned in `requirements.txt` for reproducibility.
+
+## Research pipeline
 
 ```text
-Thermal Images
-      ↓
-Image Preprocessing
-      ↓
-Dataset Preparation
-      ↓
-Deep Learning / CNN Modeling
-      ↓
-Model Evaluation
-      ↓
-Interactive Streamlit Application
+Thermal image
+    ↓
+Patient-aware data organization
+    ↓
+Preprocessing
+    ↓
+Feature extraction
+    ├── Thermal statistics
+    ├── GLCM texture
+    └── Graph / hybrid representations (experiments)
+    ↓
+Model comparison
+    ├── Logistic Regression
+    ├── SVM RBF
+    ├── XGBoost
+    ├── Simple CNN
+    └── MobileNetV2 transfer learning
+    ↓
+Held-out evaluation + GroupKFold
+    ↓
+Threshold analysis + bootstrap confidence intervals
+    ↓
+Interpretation and Streamlit research demo
 ```
 
----
+## Additional research component: Pennes bio-heat simulation
 
-## 📊 Evaluation Metrics
+The project also contains an explanatory Pennes bio-heat simulation comparing normal and suspect thermal-source scenarios. In the saved simulation summary, the suspect-source scenario shows a higher maximum simulated temperature and a hotspot increase of approximately **0.95°C** versus the normal simulation.
 
-The project evaluates classification performance using:
+This simulation is used as a **research/physical interpretation component** and is **not used to train the public classifier**.
 
-- Accuracy
-- Precision
-- Recall
-- F1-score
-- ROC-AUC
-
-Exact experimental results and figures will be documented in this repository together with the corresponding code and methodology.
-
----
-
-## 🛠️ Technologies
-
-- **Python**
-- **TensorFlow**
-- **Convolutional Neural Networks (CNN)**
-- **Computer Vision**
-- **Scikit-learn**
-- **NumPy / Pandas**
-- **Matplotlib**
-- **Streamlit**
-
----
-
-## 📁 Repository Structure
+## Repository structure
 
 ```text
 ThermoBreastAI/
-│
-├── README.md
+├── app.py
 ├── requirements.txt
-├── .gitignore
-│
-├── notebooks/       # Exploratory analysis and experiments
-├── src/             # Reusable preprocessing, training and evaluation code
-├── app/             # Streamlit application
-├── results/         # Evaluation figures and experiment results
-└── docs/            # Additional project documentation
+├── .streamlit/
+│   └── config.toml
+├── models/
+│   ├── best_model.pkl
+│   ├── scaler.pkl
+│   └── feature_names.pkl
+├── src/
+│   ├── preprocessing.py
+│   ├── feature_extraction.py
+│   ├── prediction.py
+│   └── agent.py
+└── data/
+    └── project_results/
+        ├── final_model_comparison.csv
+        ├── ablation_best_by_feature.csv
+        ├── bootstrap_ci_best_ml.csv
+        ├── groupkfold_summary.csv
+        ├── threshold_curve_best_ml.csv
+        └── pennes_*.csv
 ```
 
----
+## Run locally
 
-## 🔬 Project Scope
+```bash
+git clone https://github.com/Sidahmed8/ThermoBreastAI.git
+cd ThermoBreastAI
+python -m venv .venv
+pip install -r requirements.txt
+streamlit run app.py
+```
 
-This repository is intended to present the project in a reproducible and professional format while respecting any restrictions related to medical data and research materials.
+## Reproducibility and privacy
 
-The public version will focus on:
+The repository publishes the inference code, compact trained model and aggregate evaluation artifacts needed to demonstrate the pipeline. Raw medical images and row-level error-analysis files are excluded to keep the public repository focused and privacy-conscious.
 
-- Methodology
-- Reusable code
-- Model architecture
-- Evaluation workflow
-- Non-sensitive results and visualizations
-- Application screenshots or demonstrations
-
-Private or restricted medical data will not be published.
-
----
-
-## 🚀 Current Status
-
-The repository structure and documentation are being prepared for the public release of the project code and results.
-
-Upcoming additions:
-
-- [ ] Preprocessing pipeline
-- [ ] Training pipeline
-- [ ] Model evaluation code
-- [ ] Experiment results and visualizations
-- [ ] Streamlit application
-- [ ] Reproducibility instructions
-
----
-
-## 👤 Author
+## Author
 
 **Sidahmed Ahmedou Emeihimid**  
-MSc in Data Science & Data Engineering  
-Junior Data Scientist | Machine Learning & Data Engineering
-
-- [LinkedIn](https://www.linkedin.com/in/sid-ahmed-emeihimid-7208002b3/)
-- [Portfolio](https://imaginative-cranachan-0ebae2.netlify.app/)
-- [GitHub](https://github.com/Sidahmed8)
+MSc Data Science & Data Engineering  
+[LinkedIn](https://www.linkedin.com/in/sid-ahmed-emeihimid-7208002b3/) · [GitHub](https://github.com/Sidahmed8)
 
 ---
 
-## 📌 Important Note
-
-This repository is provided for **academic, research and portfolio purposes only**. Any medical interpretation or clinical use requires appropriate validation, regulatory review and supervision by qualified healthcare professionals.
+If you work on **medical imaging, thermal imaging, interpretable ML, Computer Vision or healthcare AI research**, I am open to research discussions and collaboration.
