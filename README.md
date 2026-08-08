@@ -130,7 +130,7 @@ The repository publishes the inference code, compact trained model and aggregate
 
 **Sidahmed Ahmedou Emeihimid**  
 MSc Data Science & Data Engineering  
-[LinkedIn](https://www.linkedin.com/in/sid-ahmed-emeihimid-7208002b3/) · [GitHub](https://github.com/Sidahmed8)
+[LinkedIn](https://www.linkedin.com/in/sidahmed-emeihimid-7208002b3/) · [GitHub](https://github.com/Sidahmed8)
 
 ---
 
